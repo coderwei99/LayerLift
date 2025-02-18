@@ -1,71 +1,103 @@
-import { Modal, type ModalConfig } from '@arco-design/web-vue';
-import { h } from 'vue';
-import type { Component } from 'vue';
-import type { TTModal } from '../types/modal';
-import type { RenderContent } from '@arco-design/web-vue/es/_utils/types';
+import { createApp, h, type Component, type App, ref, reactive, type UnwrapNestedRefs } from 'vue';
+import { Modal } from '@arco-design/web-vue';
 
+type ModalInstance = {
+  id: symbol;
+  app: App;
+  container: HTMLDivElement;
+  close: () => void;
+};
 
-class ModalManager {
-  private dialogStack: any[] = [];
+interface ModalOptions {
+  title?: string;
+  width?: number | string;
+  okText?: string;
+  cancelText?: string;
+}
 
-  constructor() {
-    this.dialogStack = []; // 存储打开的 Modal 堆栈
-  }
+export class ModalService {
+  private instances: ModalInstance[] = [];
 
-  open(component: Component, props: Omit<ModalConfig, 'content'>, parentModal = null): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const parentDialog = this.dialogStack[this.dialogStack.length - 1];
+  public open<T extends object>(
+    component: Component,
+    formModel: T,
+    options: ModalOptions = {}
+  ): Promise<UnwrapNestedRefs<T>> {
+    const container = document.createElement('div');
+    const id = Symbol('modal-instance');
+    const self = this;
 
-      const currentDialog: TTModal = {
-        component,
-        props,
-        modal: null,
-        parentModal: parentDialog,
-      };
+    const state = reactive(formModel) as UnwrapNestedRefs<T>;
+    let resolveRef: (value: UnwrapNestedRefs<T>) => void;
+    let rejectRef: (reason?: any) => void;
 
-      const modal = Modal.open({
-        title: props.title || 'Dialog Title',
-        content: h(component, {
-          ...props,
-          openSubModal: this.openSubModal.bind(this),
-        }) as unknown as RenderContent,
-        onCancel: () => {
-          this.close(currentDialog);
-          reject('canceled');
-        },
-        onOk: () => {
-          // 通过 ref 获取组件实例和其内部数据
-          this.close(currentDialog);
-          resolve(1);
-        },
-        ...props,
-      });
+    const app = createApp({
+      setup() {
+        const visible = ref(true);
 
-      currentDialog.modal = modal;
-      this.dialogStack.push(currentDialog);
+        const handleSubmit = () => {
+          visible.value = false;
+          resolveRef({ ...state });
+        };
+
+        const handleCancel = (reason = 'Modal canceled') => {
+          visible.value = false;
+          rejectRef(new Error(reason));
+        };
+
+        return () => h(Modal, {
+          visible: visible.value,
+          title: options.title,
+          width: options.width,
+          okText: options.okText,
+          cancelText: options.cancelText,
+          onOk: handleSubmit,
+          onCancel: () => handleCancel('User clicked cancel'),
+          onMaskClick: () => handleCancel('User clicked mask'),
+          afterClose: () => {
+            self.removeInstance(id);
+            app.unmount();
+            container.remove();
+          }
+        }, {
+          default: () => h(component, {
+            model: state,
+            onSubmit: handleSubmit,
+            onClose: () => handleCancel('User triggered close')
+          })
+        });
+      }
+    });
+
+    this.instances.push({
+      id,
+      app,
+      container,
+      close: () => {
+        rejectRef(new Error('Programmatic close'));
+        app.unmount();
+      }
+    });
+
+    document.body.appendChild(container);
+    app.mount(container);
+
+    return new Promise<UnwrapNestedRefs<T>>((resolve, reject) => {
+      resolveRef = resolve;
+      rejectRef = reject;
     });
   }
 
-  close(dialog: TTModal) {
-    if (!dialog.modal) return;
-    dialog.modal.close(); // 关闭当前对话框
-
-    // 移除堆栈中的当前对话框
-    const index = this.dialogStack.indexOf(dialog);
-    if (index !== -1) {
-      this.dialogStack.splice(index, 1);
-    }
-
-    // 如果存在父级 Modal，关闭父级 Modal
-    if (dialog.parentModal) {
-      dialog.parentModal.close();
+  private removeInstance(id: symbol) {
+    const index = this.instances.findIndex(i => i.id === id);
+    if (index > -1) {
+      const instance = this.instances.splice(index, 1)[0];
+      instance.container.remove();
     }
   }
 
-  // 用于打开子级 Modal 的方法
-  openSubModal(component: Component, props: Omit<ModalConfig, 'content'>) {
-    this.open(component, props);
+  public closeAll() {
+    this.instances.forEach(instance => instance.close());
+    this.instances = [];
   }
 }
-
-export default ModalManager;
