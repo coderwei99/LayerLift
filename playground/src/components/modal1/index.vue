@@ -27,6 +27,14 @@ const handleOpenModal = async () => {
       <a-form-item label="age" name="age">
         <a-input v-model="model.age" />
       </a-form-item>
+      <a-form-item field="post" label="Post">
+        <a-select v-model="model.post">
+          <a-option value="post1">Post1</a-option>
+          <a-option value="post2">Post2</a-option>
+          <a-option value="post3">Post3</a-option>
+          <a-option value="post4">Post4</a-option>
+        </a-select>
+      </a-form-item>
     </a-form>
     <button @click="handleOpenModal">open modal 2</button>
   </div>
