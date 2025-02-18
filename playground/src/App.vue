@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { reactive } from 'vue';
 import Modal1 from './components/modal1/index.vue';
 import { useModal } from './packages/tt-modal';
 
-const { dialog } = useModal();
-const loading = ref(false);
+const modal  = useModal();
 const handleOpenModal = async () => {
-  const ret = await dialog.open(Modal1, { title: 'Modal 1', okLoading: loading.value });
-  loading.value = true;
+  const formData = reactive({
+    name: '',
+    age: '',
+  });
 
-  console.log('open modal 1', ret);
-
-  setTimeout(() => {
-    loading.value = false;
-  }, 1000);
+  const ret = await modal.open(Modal1, formData, { title: 'Modal 1' });
+  console.log('ret', ret);
 };
 </script>
 <template>
