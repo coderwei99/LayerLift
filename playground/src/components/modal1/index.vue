@@ -10,7 +10,7 @@ defineProps<{
 
 const modal  = useModal();
 const handleOpenModal = async () => {
-  const ret = await modal.open(Modal2, { title: 'Modal 2' });
+  const ret = await modal.open(Modal2, {},{ title: 'Modal 2' });
   console.log('ret', ret);
 };
 
