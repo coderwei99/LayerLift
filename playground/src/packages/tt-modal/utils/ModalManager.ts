@@ -37,6 +37,7 @@ export class ModalService {
 
         const handleSubmit = () => {
           visible.value = false;
+          // todo: 确认一下 什么时候应该去调用 resolve
           resolveRef({ ...state });
         };
 
