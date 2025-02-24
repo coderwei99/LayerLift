@@ -35,8 +35,8 @@ import '@arco-design/web-vue/dist/arco.css';
 ### 示例代码
 以下是一个简单的使用示例，展示如何使用 `LayerLift` 打开一个模态框：
 
-```vue
-<!-- 示例组件 -->
+```typescript
+// 示例组件
 <script setup lang="ts">
 import { reactive } from 'vue';
 import { useModal } from 'layerlift';
@@ -79,8 +79,8 @@ const fetchData = () => Promise.resolve({ success: true });
 ### 自定义模态框组件
 你需要创建一个自定义组件作为模态框内容，例如：
 
-```vue
-<!-- CustomModal.vue -->
+```typescript
+// CustomModal.vue 
 <script setup lang="ts">
 defineProps<{
   model: { name: string; age: string };
