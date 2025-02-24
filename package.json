@@ -1,6 +1,9 @@
 {
-  "name": "layerlift-monorepo",
-  "private": true,
+  "name": "layerlift",
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/coderwei99/LayerLift/issues"
+  },
   "scripts": {
     "build": "pnpm -r build",
     "publish": "pnpm -r publish --access public"
