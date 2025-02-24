@@ -8,7 +8,7 @@ type ModalInstance = {
   close: () => void;
 };
 
-interface ModalOptions {
+export interface ModalOptions {
   title?: string;
   width?: number | string;
   okText?: string;

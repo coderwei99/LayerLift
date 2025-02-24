@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": [
+    "*.ts"
+  ], // 只包含根目录下的 .ts 文件
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
