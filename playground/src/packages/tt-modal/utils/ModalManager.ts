@@ -21,6 +21,7 @@ export class ModalService {
   public open<T extends object>(
     component: Component,
     formModel: T,
+    customCallback: (state: UnwrapNestedRefs<T>, resolve: (value: UnwrapNestedRefs<T>) => void, reject: (forceClose?: boolean) => void) => void,
     options: ModalOptions = {}
   ): Promise<UnwrapNestedRefs<T>> {
     const container = document.createElement('div');
@@ -34,11 +35,18 @@ export class ModalService {
     const app = createApp({
       setup() {
         const visible = ref(true);
-
-        const handleSubmit = () => {
+        const shouldCloseModal = ref(false);
+        const handleSubmit = async () => {
+          await customCallback({ ...state }, () => {
+            shouldCloseModal.value = false;
+            resolveRef({ ...state });
+          }, (forceClose = false) => {
+            !forceClose && (shouldCloseModal.value = true);
+            rejectRef();
+          });
+          if (shouldCloseModal.value) return;
           visible.value = false;
-          // todo: 确认一下 什么时候应该去调用 resolve
-          resolveRef({ ...state });
+          console.log('handleSubmit is finished');
         };
 
         const handleCancel = (reason = 'Modal canceled') => {
