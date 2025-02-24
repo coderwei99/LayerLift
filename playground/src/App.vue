@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import Modal1 from './components/modal1/index.vue';
-import { useModal } from './packages/tt-modal';
+import { useModal } from 'layerlift';
 
 const modal  = useModal();
 const updateUserInfo: () => Promise<{ code: number, message: string }> = async () => {

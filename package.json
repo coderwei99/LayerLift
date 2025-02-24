@@ -1,16 +1,11 @@
 {
-  "name": "vue3-component-library",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "layerlift-monorepo",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ]
+  "scripts": {
+    "build": "pnpm -r build",
+    "publish": "pnpm -r publish --access public"
+  },
+  "devDependencies": {
+    "pnpm": "^8.0.0"
+  }
 }
