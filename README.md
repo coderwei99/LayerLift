@@ -1,4 +1,4 @@
-
+> 探索阶段，不建议在生产环境使用，欢迎提交 issue 或 pull request，帮助我们改进 `LayerLift`！ 
 ---
 
 # LayerLift - 轻量级 Vue 3 模态框管理库
